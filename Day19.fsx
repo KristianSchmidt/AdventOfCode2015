@@ -1,6 +1,7 @@
 #load "Helpers.fsx"
 
 open System
+open System.Text.RegularExpressions
 
 let data = Helpers.Web.getInput 19
 
@@ -41,4 +42,26 @@ let ans1 =
     |> List.collect (fun (i,prev) -> rules[prev] |> List.ofArray |> List.map (replaceAt i prev))
     |> Set.ofList
     |> Set.count
+
+// Part 2
+
+let molecule = data |> Array.last
+
+let rules2 =
+    data[0..data.Length-3]
+    |> Array.map (Helpers.split " => ")
+    |> Array.map (fun [|k;v|] -> (v,k))
+
+let mutable minSol = Int32.MaxValue
+let rec findSol (step : int) (currMol : string) =
+    if (currMol = "e") then
+        if (step < minSol) then
+            minSol <- step
+            printfn "New min: %i" minSol
+    else
+        for (k,v) in rules2 do
+            if (currMol.IndexOf(k) > -1) then
+                findSol (step+(Regex.Matches(currMol, k)).Count) (currMol.Replace(k,v))
+
+findSol 0 molecule
 
