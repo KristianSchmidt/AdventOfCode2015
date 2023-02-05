@@ -60,8 +60,9 @@ let rec findSol (step : int) (currMol : string) =
             printfn "New min: %i" minSol
     else
         for (k,v) in rules2 do
-            if (currMol.IndexOf(k) > -1) then
-                findSol (step+(Regex.Matches(currMol, k)).Count) (currMol.Replace(k,v))
+            let count = Regex.Matches(currMol, k).Count
+            if (count > 0) then
+                findSol (step+count) (currMol.Replace(k,v))
 
 findSol 0 molecule
 
